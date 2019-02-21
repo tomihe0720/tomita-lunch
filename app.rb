@@ -1,6 +1,7 @@
 require 'sinatra'
 require 'sinatra/reloader'
 require 'json'
+require 'rest_client'
 
 get '/' do
   'hello world!!'
@@ -14,8 +15,19 @@ get '/callback' do
 end
 
 post '/callback' do
-  request_body = JSON.parse(request.body.read)
-  puts request_body
+  hash = JSON.parse(request.body.read)
+  message = hash["entry"][0]["messaging"][0] #entryの0個目のmessagingの0個目
+  sender = message["sender"]["id"] #上記で取得したmessage変数の中のsenderのid
+  text = message["message"]["text"]#上記で取得したmessage変数の中のmessageのtest
+  endpoint = "https://graph.facebook.com/v2.6/me/messages?access_token=" + "EAAEIr8ppJUYBALtJmTQ7zk6zoQbKXHBoHqL3iOalZCcC1WtjzIqOvHYcasMZAuZBvKSjxt59y3MiDQVNjUcTP0kP85lzZCGg4rLW9MCOvwjb6QnL469vmnwbexVeFFStRauUqovl94ZA3XtxlavW97Xp5iAhYCFn0W9r0ZAeQcmgZDZD"
+  content = {
+    recipient: {id: sender},
+    message: {text: text}
+  }
+  request_body = content.to_json
+
+  #オウム返しの返信をPOSTする（返す）
+  RestClient.post endpoint, request_body, content_type: :json, accept: :json
   status 201
   body ''
 end
