@@ -47,7 +47,7 @@ post '/callback' do
 
   else
 
-    text = "富田のオススメグルメを教えるよ！カテゴリーと位置情報からレストランを検索します。レストランを検索したい場合は、「レストラン検索」と話しかけてね！"
+    text = "富田のオススメグルメを教えるよ:-)カテゴリーと位置情報からレストランを検索します。レストランを検索したい場合は、「レストラン検索」と話しかけてね！"
     content = {
       recipient: {id: sender},
       message: {text: text}
@@ -90,7 +90,7 @@ helpers do
       id: sender
     },
     message: {
-      text: '富田のオススメ教えます (B) なにが食べたいか教えて?',
+      text: '富田のオススメ教えちゃうぞ :P なにが食べたいか教えて?',
       quick_replies: categories
     }
   }.to_json
@@ -102,7 +102,7 @@ helpers do
       id: sender
     },
     message: {
-      text: "位置情報を送信してね (mp)",
+      text: "位置情報を送信してね (^^^)",
       quick_replies: [
         { content_type: "location" }
       ]
