@@ -29,7 +29,7 @@ post '/callback' do
   request_body = content.to_json
 
   #オウム返しの返信をPOSTする（返す）
-  RestClient.post endpoint, request_body, content_type: :json, accept: :json
+  RestClient.post FB_ENDPOINT, request_body, content_type: :json, accept: :json
   status 201
   body ''
 end
