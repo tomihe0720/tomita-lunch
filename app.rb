@@ -25,8 +25,13 @@ post '/callback' do
   sender = message["sender"]["id"] #上記で取得したmessage変数の中のsenderのid
 
   if message["message"]["text"] == "レストラン検索"
-    categories = filter_categories
-    request_body = set_quick_reply_of_categories(sender, categories)
+    
+  elsif !message["message"]["quick_reply"].nil?
+
+    # カテゴリーコードは引き回すのでグローバル変数として定義
+    # ローカル変数だと別メソッドからは呼び出せません
+    $requested_category_code = message["message"]["quick_reply"]["payload"]
+    request_body = set_quick_reply_of_location(sender)
     RestClient.post FB_ENDPOINT, request_body, content_type: :json, accept: :json
 
   else
