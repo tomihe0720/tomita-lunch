@@ -1,5 +1,6 @@
 require 'sinatra'
 require 'sinatra/reloader'
+require 'json'
 
 get '/' do
   'hello world!!'
@@ -10,4 +11,11 @@ get '/callback' do
     return 'Error, wrong validation token'
   end
   params["hub.challenge"]
+end
+
+post '/callback' do
+  request_body = JSON.parse(request.body.read)
+  puts request_body
+  status 201
+  body ''
 end
