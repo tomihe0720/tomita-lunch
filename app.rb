@@ -88,4 +88,18 @@ helpers do
   }.to_json
   end
 
+  def set_quick_reply_of_location sender
+  {
+    recipient: {
+      id: sender
+    },
+    message: {
+      text: "位置情報を送信してね :P",
+      quick_replies: [
+        { content_type: "location" }
+      ]
+    }
+  }.to_json
+end
+
 end
