@@ -90,7 +90,7 @@ helpers do
       id: sender
     },
     message: {
-      text: '富田のオススメ教えちゃうぞ :P なにが食べたいか教えて?',
+      text: '富田のオススメ教えます (B) なにが食べたいか教えて?',
       quick_replies: categories
     }
   }.to_json
@@ -102,7 +102,7 @@ helpers do
       id: sender
     },
     message: {
-      text: "位置情報を送信してね :P",
+      text: "位置情報を送信してね (mp)",
       quick_replies: [
         { content_type: "location" }
       ]
