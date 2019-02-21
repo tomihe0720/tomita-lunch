@@ -3,10 +3,11 @@ require 'sinatra/reloader'
 require 'json'
 require 'rest_client'
 
+FB_ENDPOINT = "https://graph.facebook.com/v2.6/me/messages?access_token=" + "EAAEIr8ppJUYBALtJmTQ7zk6zoQbKXHBoHqL3iOalZCcC1WtjzIqOvHYcasMZAuZBvKSjxt59y3MiDQVNjUcTP0kP85lzZCGg4rLW9MCOvwjb6QnL469vmnwbexVeFFStRauUqovl94ZA3XtxlavW97Xp5iAhYCFn0W9r0ZAeQcmgZDZD"
 GNAVI_KEYID = "3b5b8c8869545e8ab33ee49b2d7eb592"
 GNAVI_CATEGORY_LARGE_SEARCH_API = "https://api.gnavi.co.jp/master/CategoryLargeSearchAPI/v3/"
+GNAVI_SEARCHAPI = "https://api.gnavi.co.jp/RestSearchAPI/v3/"
 
-FB_ENDPOINT = "https://graph.facebook.com/v2.6/me/messages?access_token=" + "EAAEIr8ppJUYBALtJmTQ7zk6zoQbKXHBoHqL3iOalZCcC1WtjzIqOvHYcasMZAuZBvKSjxt59y3MiDQVNjUcTP0kP85lzZCGg4rLW9MCOvwjb6QnL469vmnwbexVeFFStRauUqovl94ZA3XtxlavW97Xp5iAhYCFn0W9r0ZAeQcmgZDZD"
 
 get '/' do
   'hello world!!'
@@ -36,6 +37,13 @@ post '/callback' do
      $requested_category_code = message["message"]["quick_reply"]["payload"]
      request_body = set_quick_reply_of_location(sender)
      RestClient.post FB_ENDPOINT, request_body, content_type: :json, accept: :json
+
+   elsif !message["message"]["attachments"].nil? && message["message"]["attachments"][0]["type"] == 'location' && !$requested_category_code.nil?
+   lat, long = get_location(message)
+   restaurants = get_restaurants(lat, long, $requested_category_code)
+   elements = set_restaurants_info(restaurants)
+   request_body = set_reply_of_restaurant(sender, elements)
+   RestClient.post FB_ENDPOINT, request_body, content_type: :json, accept: :json
 
   else
 
@@ -100,6 +108,63 @@ helpers do
       ]
     }
   }.to_json
-end
+  end
+
+  def get_location message
+  lat = message["message"]["attachments"][0]["payload"]["coordinates"]["lat"]
+  long = message["message"]["attachments"][0]["payload"]["coordinates"]["long"]
+  [lat, long]
+  end
+
+  def get_restaurants lat, long, requested_category_code
+    # 緯度,経度,カテゴリー,範囲を指定
+    params = "?keyid=#{GNAVI_KEYID}&latitude=#{lat}&longitude=#{long}&category_l=#{requested_category_code}&range=3"
+    restaurants = JSON.parse(RestClient.get GNAVI_SEARCHAPI + params)
+    restaurants
+  end
+
+  # APIで取得したレストラン情報をMessengerで送信できる構文に整形
+  def set_restaurants_info restaurants
+    elements = []
+    restaurants["rest"].each do |rest|
+        # 三項演算子
+      image = rest["image_url"]["shop_image1"].empty? ? "http://techpit-bot.herokuapp.com/images/no-image.png" : rest["image_url"]["shop_image1"]
+      elements.push(
+        {
+          title: rest["name"],
+          item_url: rest["url_mobile"],
+          image_url: image,
+          subtitle: "[カテゴリー: #{rest["code"]["category_name_l"][0]}] #{rest["pr"]["pr_short"]}",
+          buttons: [
+            {
+              type: "web_url",
+              url: rest["url_mobile"],
+              title: "詳細を見る"
+            }
+          ]
+        }
+      )
+    end
+    elements
+  end
+
+  # 整形したレストラン情報をMessengerで返却できる構文に整形
+  def set_reply_of_restaurant sender, elements
+    {
+      recipient: {
+        id: sender
+      },
+      message: {
+        attachment: {
+          type: 'template',
+          payload: {
+            template_type: "generic",
+            elements: elements
+          }
+        }
+      }
+    }.to_json
+  end
+
 
 end
