@@ -3,6 +3,8 @@ require 'sinatra/reloader'
 require 'json'
 require 'rest_client'
 
+FB_ENDPOINT = "https://graph.facebook.com/v2.6/me/messages?access_token=" + "EAAEIr8ppJUYBALtJmTQ7zk6zoQbKXHBoHqL3iOalZCcC1WtjzIqOvHYcasMZAuZBvKSjxt59y3MiDQVNjUcTP0kP85lzZCGg4rLW9MCOvwjb6QnL469vmnwbexVeFFStRauUqovl94ZA3XtxlavW97Xp5iAhYCFn0W9r0ZAeQcmgZDZD"
+
 get '/' do
   'hello world!!'
 end
@@ -18,8 +20,8 @@ post '/callback' do
   hash = JSON.parse(request.body.read)
   message = hash["entry"][0]["messaging"][0] #entryの0個目のmessagingの0個目
   sender = message["sender"]["id"] #上記で取得したmessage変数の中のsenderのid
-  text = message["message"]["text"]#上記で取得したmessage変数の中のmessageのtest
-  endpoint = "https://graph.facebook.com/v2.6/me/messages?access_token=" + "EAAEIr8ppJUYBALtJmTQ7zk6zoQbKXHBoHqL3iOalZCcC1WtjzIqOvHYcasMZAuZBvKSjxt59y3MiDQVNjUcTP0kP85lzZCGg4rLW9MCOvwjb6QnL469vmnwbexVeFFStRauUqovl94ZA3XtxlavW97Xp5iAhYCFn0W9r0ZAeQcmgZDZD"
+  text = "富田のオススメランチを教えるよ！カテゴリーと位置情報からレストランを検索します。レストランを検索したい場合は、「レストラン検索」と話しかけてね！"
+
   content = {
     recipient: {id: sender},
     message: {text: text}
