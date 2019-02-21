@@ -47,7 +47,7 @@ post '/callback' do
 
   else
 
-    text = "富田のオススメグルメを教えるよ:-)カテゴリーと位置情報からレストランを検索します。レストランを検索したい場合は、「レストラン検索」と話しかけてね！"
+    text = "富田のオススメグルメを教えるよ :-) カテゴリーと位置情報からレストランを検索します。レストランを検索したい場合は、「レストラン検索」と話しかけてね！"
     content = {
       recipient: {id: sender},
       message: {text: text}
@@ -102,7 +102,7 @@ helpers do
       id: sender
     },
     message: {
-      text: "位置情報を送信してね (^^^)",
+      text: "位置情報を送信してね :P ",
       quick_replies: [
         { content_type: "location" }
       ]
